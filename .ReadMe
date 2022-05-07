@@ -1,0 +1,10 @@
+-Một số lỗi chưa fix được:
+    + Đổi tên thư mục: nếu bên trong thư mục cần đổi có chứa một thư mục khác thì không đổi được tên 
+    + Download thư mục thành zip: nếu bên trong thư mục cần download có chứa một thư mục khác thì không download được 
+
+
+-Ghi chú chức năng search:
+    + Chỉ search được ghi gõ chính xác tên file và thư mục vì chưa có chức năng gợi ý
+    + Muốn xem bên trong thư mục có gì thì ghi dấu / ở cuối 
+        (Nó sẽ đi vào trong thư mục đó và có thể thêm file, thư mục mới vào thư mục đó) - VD: nameFolder/
+

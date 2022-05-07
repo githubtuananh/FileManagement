@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css    ">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    p.item {
+      padding: 16px;
+      text-align: center;
+      border-radius: 8px;
+      color: white;
+      background-color: green;
+    }
+  </style>
+</head>
+
+<body class="bg-secondary">
+
+  <h3 class="text-center my-5 text-light">User Login</h3>
+
+  <!-- buộc toàn bộ dòng và cột phải bỏ trong class container -->
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-5">
+        <div class="border p-3 rounded bg-light">
+          <form action="/login" method="post" id="formLogin">
+            <div class="form-group">
+              <label for="user">Username</label>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-user"></i>
+                  </span>
+                </div>
+                <input id="username" type="text" class="form-control" name="username" placeholder="Username">
+              </div>
+
+            </div>
+            <div class="form-group">
+              <label for="pass">Password</label>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                </div>
+                <input type="password" name="password" class="form-control" placeholder="Password">
+              </div>
+            </div>
+            <div class="form-group" style="display: none;">
+              <label for="pass">Token</label>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                </div>
+                <input class="form-control" type="" name="_csrf" value="<%= csrfToken %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="customCheck" name="example1">
+                <label class="custom-control-label" for="customCheck">Remember</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="alert alert-danger alert-dismissible fade show" id="alertMessage" style="display: none;">
+                Invalid username or password!
+              </div>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-success px-5" type="submit">Login</button>
+            </div>
+            <div class="form-group">
+              <p>Don't have any account? <a href="/register">Register now!</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  $(document).ready(() => {
+    $("#formLogin").submit((e) => {
+      e.preventDefault();
+      const body = {
+        username: $("input[name='username']").val(),
+        password: $("input[name='password']").val(),
+      }
+      $.ajax({
+        url: '/login',
+        type: 'post',
+        data: JSON.stringify(body),
+        headers: {
+          'CSRF-Token': $("input[name='_csrf']").val(),
+          'Content-Type': 'application/json',
+        },
+        success: function (data) {
+          if (data.code == 200) {
+            window.location.href = "/";
+          } else {
+            $("#alertMessage").text(data.message);
+            $("#alertMessage").css("display", "block");
+            setTimeout(() => {
+              $("#alertMessage").fadeOut();
+            }, 1000)
+          }
+        }
+      });
+    })
+  })
+
+
+      // document.querySelector("#formLogin").addEventListener("submit", async(e) => {
+      //   e.preventDefault();
+
+      //   const data = {
+      //     username: document.querySelector("input[name='username']").value,
+      //     password: document.querySelector("input[name='password']").value,
+      //   }
+
+      //   const t = await fetch("/login",{
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     },
+      //     body: JSON.stringify(data),
+      //   });
+
+      //   const response = await t.json();
+      //   console.log(response)
+      // })
+</script>
+
+</html>

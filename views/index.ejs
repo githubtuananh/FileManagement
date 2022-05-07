@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>File Managements</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+        integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+        src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <style>
+        .fa,
+        .fas {
+            color: #858585;
+        }
+
+        .fa-folder {
+            color: rgb(74, 158, 255);
+        }
+
+        i.fa,
+        table i.fas {
+            font-size: 16px;
+            margin-right: 6px;
+        }
+
+        i.action {
+            cursor: pointer;
+        }
+
+        a {
+            color: black;
+        }
+    </style>
+</head>
+<script>
+    //Reload khi lùi lại
+    var perfEntries = performance.getEntriesByType("navigation");
+    if (perfEntries[0].type === "back_forward") {
+        location.reload(true);
+    }
+    // --------
+    if (!$.cookie("user")) {
+        window.location.href = "/login";
+    }
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });     
+</script>
+
+<body>
+    <div class="container">
+        <div id="dir" style="display: none;"></div>
+        <div class="row align-items-center py-5">
+            <div class="col-6">
+                <h3>
+                    File Manager</h2>
+            </div>
+            <div class="col-6">
+                <div class="dropdown text-right">
+                    Xin chào <a class="dropdown-toggle text-primary" data-toggle="dropdown"><%= name %></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-info-circle"></i>
+                            &nbsp;&nbsp;Cập nhật thông tin
+                        </a>
+                        <a class="dropdown-item" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp; Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+        </ol>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <span class="fa fa-search"></span>
+                </span>
+            </div>
+            <input type="text" id="search" class="form-control" placeholder="Search">
+        </div>
+        <div class="btn-group my-3">
+            <button id="btn-createF" type="button" class="btn btn-light border">
+                <i class="fas fa-folder-plus"></i> New folder
+            </button>
+            <button id="btn-createFile" type="button" class="btn btn-light border">
+                <i class="fas fa-file"></i> Create text file
+            </button>
+        </div>
+        <div id="flash-alert" class="alert alert-success text-center w-25 mx-auto my-3" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span id="message1"><strong id="messageNoti"></strong></span>
+        </div>
+        <table class="table table-hover border">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Last modified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% files.forEach(f=> { %>
+                    <tr id="<%= f.name %>" dir="<%= f.dir %>">
+                        <td>
+                            <%- f.icon -%>
+                                <a href="<%= f.subPath %>">
+                                    <%= f.name %>
+                                </a>
+                        </td>
+                        <td>
+                            <%= f.type %>
+                        </td>
+                        <td>
+                            <%= f.size %>
+                        </td>
+                        <td>
+                            <%= f.lastModified %>
+                        </td>
+                        <td>
+                            <span><i class="fa fa-download action download-action"></i></button>
+                                <span><i class="fa fa-edit action edit-action"></i></button>
+                                    <span><i class="fa fa-trash action delete-action"></i></button>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+        <div id="flash-alert-upload" class="alert alert-success text-center w-25 mx-auto my-3" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span id="message1"><strong id="messageNoti-upload"></strong></span>
+        </div>
+        <div class="border rounded mb-3 mt-5 p-3">
+            <h4>File upload</h4>
+            <form id="form-upload" enctype="multipart/form-data">
+                <div class="form-group">
+                    <div class="custom">
+                        <input type="text" class="custom-file-input" id="customFile1" name="username"
+                            value="<%= email %>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="file">
+                        <label id="label-name" class="custom-file-label" for="customFile">Choose file</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <p style="color: red; font-size: 20px;" id="message"></p>
+                </div>
+                <div class="form-group">
+                    <div class="progress" style="height:5px">
+                        <div id="progress-upload" class="progress-bar bg-success" style="width:0;height:10px"></div>
+                    </div>
+                </div>
+                <div class="form-group" style="display: none;">
+                    <label for="pass">Token</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                        </div>
+                        <input hidden class="form-control" type="" name="_csrf" value="<%= csrfToken %>">
+                    </div>
+                </div>
+                <button id="btn-upload" class="btn btn-success px-5">Upload</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete dialog -->
+    <div class="modal fade" id="confirm-delete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Xóa tập tin</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    Bạn có chắc rằng muốn xóa tập tin <strong id="nameDel"></strong>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="btn-delete" type="button" class="btn btn-danger" data-dismiss="modal">Xóa</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Rename dialog -->
+    <div class="modal fade" id="confirm-rename">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Đổi tên</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Nhập tên mới cho tập tin <strong id="nameOld">Document.txt</strong></p>
+                    <input type="text" id="nameFile" placeholder="Nhập tên mới" value="" class="form-control" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btn-rename" class="btn btn-primary" data-dismiss="modal">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create folder -->
+    <div class="modal fade" id="confirm-new-folder">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Tạo thư mục</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Nhập tên thư mục</p>
+                    <input type="text" id="nameFolder" placeholder="Nhập tên" value="" class="form-control" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btn-new-folder" class="btn btn-primary" data-dismiss="modal">Tạo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New file dialog -->
+    <div class="modal fade" id="new-file-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Tạo tập tin mới</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">File Name</label>
+                        <input type="text" placeholder="File name" name="name" class="form-control" id="name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Nội dung</label>
+                        <textarea rows="10" id="content" class="form-control" name="content"
+                            placeholder="Nội dung"></textarea>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-new-file" class="btn btn-success" data-dismiss="modal">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- message dialog -->
+    <div class="modal fade" id="message-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Xóa file</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Bạn không được cấp quyền để xóa tập tin/thư mục này</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="js/main.js"></script>
+<script>
+</script>
+</html>
